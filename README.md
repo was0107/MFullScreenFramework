@@ -57,6 +57,7 @@
 }
 ```
 ##效果图展示
+为更好的展示效果，GIF图片使用了黑白效果
 <img src="https://raw.githubusercontent.com/was0107/MFullScreenFramework/master/images/full.gif" width="50%">
 
 
