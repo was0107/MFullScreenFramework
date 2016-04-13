@@ -3,7 +3,7 @@
 //  MFullScreenFramework
 //
 //  Created by Micker on 16/3/1.
-//  Copyright © 2016年 b5m. All rights reserved.
+//  Copyright © 2016年 micker. All rights reserved.
 //
 
 #import "UIImage+Full.h"

@@ -3,7 +3,7 @@
 //  MFullScreenFramework
 //
 //  Created by boguang on 15/8/20.
-//  Copyright (c) 2015年 b5m. All rights reserved.
+//  Copyright (c) 2015年 micker. All rights reserved.
 //
 
 #import "MFullScreenControl.h"
