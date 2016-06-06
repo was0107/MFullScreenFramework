@@ -48,6 +48,7 @@ static char UIViewReuseIdentifier;
     CGSize      _contentSize;
     NSInteger   _oldIndex;
     CGFloat     _itemSpace;
+    BOOL        _reloading;
 }
 @synthesize currentView = _currentView;
 
@@ -60,8 +61,10 @@ static char UIViewReuseIdentifier;
         _oldIndex = -1;
         _contentSize = frame.size;
         _enablePageControl = YES;
+        _reloading = NO;
         _reuseStartIndex = NSIntegerMin;
         [self addSubview:self.scrollView];
+        [self.scrollView addObserver:self forKeyPath:@"contentOffset" options:NSKeyValueObservingOptionNew context:NULL];
     }
     return self;
 }
@@ -213,7 +216,7 @@ static char UIViewReuseIdentifier;
 }
 
 - (void) observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
-    if ([@"contentOffset" isEqualToString:keyPath]) {
+    if ([@"contentOffset" isEqualToString:keyPath] && !_reloading) {
         CGFloat contentOffsetX = self.scrollView.contentOffset.x;
         if (contentOffsetX >= 0 || contentOffsetX <= [self itemWidth] * (_totalCount - 1)) {
             self.currentIndex = (contentOffsetX  + [self itemWidth]/ 2) / [self itemWidth];
@@ -254,6 +257,7 @@ static char UIViewReuseIdentifier;
 
 
 - (void) reloadData {
+    _reloading = YES;
     [[self.scrollView subviews] enumerateObjectsUsingBlock:^(__kindof UIView * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
         if ([obj.reuseIdentifier length] > 0) {
             [obj removeFromSuperview];
@@ -269,15 +273,16 @@ static char UIViewReuseIdentifier;
     CGRect rect = CGRectMake(-_itemSpace, 0, _contentSize.width + 1 *_itemSpace, _contentSize.height);
     [self.scrollView setFrame:rect];
     [self.scrollView setContentSize:CGSizeMake(_totalCount * [self itemWidth]  + _itemSpace + 1, _contentSize.height)];
-    [self.scrollView setContentOffset:CGPointMake([self itemWidth] * self.currentIndex, 0)];
+    
+    _reloading = NO;
     if (self.enablePageControl) {
         [self.scrollView showPageControl];
         [self.scrollView.pageControl setNumberOfPages:_totalCount];
         [self.scrollView.pageControl setCurrentPage:_currentIndex];
     }
     _currentView = nil;
+    [self.scrollView setContentOffset:CGPointMake([self itemWidth] * self.currentIndex, 0)];
     [self setReuseStartIndex: -_maxReuseCount / 2 + _currentIndex];
-    [self.scrollView addObserver:self forKeyPath:@"contentOffset" options:NSKeyValueObservingOptionNew context:NULL];
 }
 
 - (UIView *) dequeueReusableViewWithIdentifier:(NSString *) identifier {
