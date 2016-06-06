@@ -9,7 +9,7 @@
 #import "MFullScreenView.h"
 #import "UIImage+Full.h"
 
-#define kMinZoomScale 1.0f
+#define kMinZoomScale .98f
 #define kMaxZoomScale 2.5f
 
 @interface MFullScreenView() <UIScrollViewDelegate>
@@ -78,13 +78,13 @@
         return;
     }
     CGPoint touchPoint = [recognizer locationInView:self];
-    if (self.scrollview.zoomScale <= 1.0) {
+    if (self.scrollview.zoomScale <= kMinZoomScale) {
         CGFloat scaleX = touchPoint.x + self.scrollview.contentOffset.x;
         CGFloat sacleY = touchPoint.y + self.scrollview.contentOffset.y;
         [self.scrollview zoomToRect:CGRectMake(scaleX, sacleY, 10, 10) animated:YES];
         
     } else {
-        [self.scrollview setZoomScale:1.0 animated:YES];
+        [self.scrollview setZoomScale:kMinZoomScale animated:YES];
     }
 }
 
@@ -123,12 +123,12 @@
             imageFrame.size.width = frame.size.width;
         }
         CGFloat maxHeightScale = frame.size.height/imageFrame.size.height;
-        if (maxHeightScale < 1.0f) {
-            maxHeightScale = 1.0f / maxHeightScale;
+        if (maxHeightScale < kMinZoomScale) {
+            maxHeightScale = kMinZoomScale / maxHeightScale;
         }
         self.scrollview.minimumZoomScale = kMinZoomScale;
         self.scrollview.maximumZoomScale = MAX(kMaxZoomScale, maxHeightScale);
-        [self.scrollview setZoomScale:1.0 animated:YES];
+        [self.scrollview setZoomScale:kMinZoomScale animated:YES];
     } else {
         frame.origin = CGPointZero;
         self.imageView.frame = frame;
