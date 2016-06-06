@@ -37,6 +37,7 @@ static char UIViewReuseIdentifier;
 @property (nonatomic, assign) NSInteger                     reuseStartIndex;    //复用的起始值，一般为-_maxReuseCount/2
 @property (nonatomic, strong) NSMutableDictionary           *reuseDictioary;    //复用的视图
 @property (nonatomic, strong) NSMutableArray                *deletateViewArrays;//超出展示区域，需要删除以备复用的视图集
+@property (nonatomic, assign) NSInteger                     totalCount;
 
 @end
 
@@ -60,7 +61,6 @@ static char UIViewReuseIdentifier;
         _contentSize = frame.size;
         _enablePageControl = YES;
         _reuseStartIndex = NSIntegerMin;
-        [self.scrollView addObserver:self forKeyPath:@"contentOffset" options:NSKeyValueObservingOptionNew context:NULL];
         [self addSubview:self.scrollView];
     }
     return self;
@@ -105,7 +105,7 @@ static char UIViewReuseIdentifier;
 
 - (void) setCurrentIndex:(NSInteger)currentIndex {
     @synchronized(self) {
-        if (_currentIndex != currentIndex && (currentIndex - _totalCount) < 0) {
+        if (_currentIndex != currentIndex && (currentIndex - self.totalCount) < 0) {
             
             [self willChangeValueForKey:@"currentIndex"];
             _oldIndex = _currentIndex;
@@ -245,6 +245,13 @@ static char UIViewReuseIdentifier;
     }
 }
 
+- (NSInteger) totalCount {
+    if (self.delegate && [self.delegate respondsToSelector:@selector(numberOfView:)]) {
+        _totalCount = [self.delegate numberOfView:self];
+    }
+    return _totalCount;
+}
+
 
 - (void) reloadData {
     [[self.scrollView subviews] enumerateObjectsUsingBlock:^(__kindof UIView * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
@@ -262,6 +269,7 @@ static char UIViewReuseIdentifier;
     CGRect rect = CGRectMake(-_itemSpace, 0, _contentSize.width + 1 *_itemSpace, _contentSize.height);
     [self.scrollView setFrame:rect];
     [self.scrollView setContentSize:CGSizeMake(_totalCount * [self itemWidth]  + _itemSpace + 1, _contentSize.height)];
+    [self.scrollView setContentOffset:CGPointMake([self itemWidth] * self.currentIndex, 0)];
     if (self.enablePageControl) {
         [self.scrollView showPageControl];
         [self.scrollView.pageControl setNumberOfPages:_totalCount];
@@ -269,6 +277,7 @@ static char UIViewReuseIdentifier;
     }
     _currentView = nil;
     [self setReuseStartIndex: -_maxReuseCount / 2 + _currentIndex];
+    [self.scrollView addObserver:self forKeyPath:@"contentOffset" options:NSKeyValueObservingOptionNew context:NULL];
 }
 
 - (UIView *) dequeueReusableViewWithIdentifier:(NSString *) identifier {

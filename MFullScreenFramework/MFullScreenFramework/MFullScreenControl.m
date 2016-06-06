@@ -92,6 +92,7 @@
     viewFrame = [_sourceImageView.image getRectWithSize:[[UIScreen mainScreen] bounds].size];
     _sourceImageView.alpha = 1.0f;
     [self.screenPageView reloadData];
+
     [UIView animateWithDuration:0.35f animations:^{
         _sourceImageView.frame = viewFrame;
         _contentView.backgroundColor = [UIColor blackColor];
