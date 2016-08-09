@@ -2,6 +2,9 @@
 ##前言
 [MFullScreenFramework](https://github.com/was0107/MFullScreenFramewok),为实现淘宝中的商品详情页面中， 图片点击全屏展示而设计
 
+##效果图展示
+为更好的展示效果，GIF图片使用了黑白效果<br>
+<img src="https://raw.githubusercontent.com/was0107/MFullScreenFramework/master/images/full.gif" width="50%">
 ##简介
 *  支持任意视图的循环复用;
 *  支持滚动视图自动添加Page展示;
@@ -56,8 +59,5 @@
     return cellItem;
 }
 ```
-##效果图展示
-为更好的展示效果，GIF图片使用了黑白效果
-<img src="https://raw.githubusercontent.com/was0107/MFullScreenFramework/master/images/full.gif" width="50%">
 
 
