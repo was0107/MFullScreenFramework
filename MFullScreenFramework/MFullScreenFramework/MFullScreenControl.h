@@ -9,7 +9,7 @@
 #include <UIKit/UIKit.h>
 #import "UIScrollPageControlView.h"
 
-@interface MFullScreenControl : NSObject
+@interface MFullScreenControl : NSObject<UIScrollPagePanGestureDelegate>
 
 @property (nonatomic, strong) UIScrollPageControlView       *screenPageView;    //滚动视图
 @property (nonatomic, assign) BOOL                           isAppear;          //记录当前状态

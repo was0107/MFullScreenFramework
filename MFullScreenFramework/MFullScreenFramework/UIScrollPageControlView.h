@@ -73,6 +73,20 @@
 
 @end
 
+@protocol UIScrollPagePanGestureDelegate <NSObject>
+
+
+/**
+ 手势状态切换代码
+
+ @param state 手势状态
+ @param flag 是否结束
+ @param trans 偏移值
+ */
+- (void) onPanGestureStateChanged:(UIGestureRecognizerState) state isFinshed:(BOOL) flag trans:(float) trans;
+
+@end
+
 #pragma mark UIScrollPageControlView
 
 @interface UIScrollPageControlView : UIView
@@ -81,7 +95,10 @@
 @property (nonatomic, assign) BOOL                                  enablePageControl;  //默认为YES
 @property (nonatomic, assign) NSInteger                             currentIndex;       //当前展示
 @property (nonatomic, assign, readonly) UIView                      *currentView;       //当前展示的视图
+@property (nonatomic, strong, readonly) UIPanGestureRecognizer      *pangesture;        //缩放手势
+
 @property (nonatomic, assign) id<UIScrollPageControlViewDelegate>   delegate;
+@property (nonatomic, assign) id<UIScrollPagePanGestureDelegate>    panDelegate;
 
 /**
  *  获取当前视图的宽度，此宽度会计算间隙
@@ -112,5 +129,14 @@
  *
  */
 - (void) reloadData;
+
+
+
+/**
+ 是否启用手势操作
+
+ @param enable
+ */
+- (void) enablePanGesture:(BOOL) enable;
 
 @end

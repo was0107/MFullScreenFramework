@@ -38,6 +38,7 @@ static char UIViewReuseIdentifier;
 @property (nonatomic, strong) NSMutableDictionary           *reuseDictioary;    //复用的视图
 @property (nonatomic, strong) NSMutableArray                *deletateViewArrays;//超出展示区域，需要删除以备复用的视图集
 @property (nonatomic, assign) NSInteger                     totalCount;
+@property (nonatomic, strong) UIPanGestureRecognizer        *pangesture;        //缩放手势
 
 @end
 
@@ -48,6 +49,8 @@ static char UIViewReuseIdentifier;
     CGSize      _contentSize;
     NSInteger   _oldIndex;
     CGFloat     _itemSpace;
+    CGRect      _screenBounds;
+    CGFloat     _trigger;
     BOOL        _reloading;
 }
 @synthesize currentView = _currentView;
@@ -63,8 +66,14 @@ static char UIViewReuseIdentifier;
         _enablePageControl = YES;
         _reloading = NO;
         _reuseStartIndex = NSIntegerMin;
+        
+        _trigger = 0.1;
+        _screenBounds = [[UIScreen mainScreen] bounds];
         [self addSubview:self.scrollView];
         [self.scrollView addObserver:self forKeyPath:@"contentOffset" options:NSKeyValueObservingOptionNew context:NULL];
+        
+        [self addGestureRecognizer:self.pangesture];
+
     }
     return self;
 }
@@ -266,6 +275,14 @@ static char UIViewReuseIdentifier;
     [self.deletateViewArrays removeAllObjects];
     [self.reuseDictioary removeAllObjects];
     
+    [self setTransform:CGAffineTransformIdentity];
+    self.center = CGPointMake(_screenBounds.size.width/2 ,  _screenBounds.size.height/2 );
+    
+    [self setTransform:CGAffineTransformIdentity];
+    CGRect _screenBounds = [[UIScreen mainScreen]  bounds];
+    self.center = CGPointMake(_screenBounds.size.width/2 ,  _screenBounds.size.height/2 );
+    [self.scrollView.pageControl setHidden:NO];
+    
     _totalCount = [self.delegate numberOfView:self];
     if (self.delegate && [self.delegate respondsToSelector:@selector(minimumRowSpacing:)]) {
         _itemSpace = [self.delegate minimumRowSpacing:self];
@@ -298,6 +315,60 @@ static char UIViewReuseIdentifier;
     return nil;
 }
 
+
+#pragma mark --
+#pragma mark -- Pangesture
+
+- (UIPanGestureRecognizer *) pangesture {
+    if (!_pangesture) {
+        _pangesture = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(onPanAction:)];
+    }
+    return _pangesture;
+}
+
+
+- (void) enablePanGesture:(BOOL) enable {
+    [self.pangesture setEnabled:enable];
+}
+
+- (void) onPanAction:(UIPanGestureRecognizer *) gesture {
+    CGPoint translation = [gesture translationInView:self.superview];
+    CGSize size = _screenBounds.size;
+    float trans = 1 * translation.y/size.height;
+    trans = ((translation.y < 0 ) ? 2/3 : 1) * trans;
+    
+    if (gesture.state == UIGestureRecognizerStateBegan) {
+        [self.scrollView.pageControl setHidden:YES];
+        if (self.panDelegate && [self.panDelegate respondsToSelector:@selector(onPanGestureStateChanged:isFinshed:trans:)]) {
+            [self.panDelegate onPanGestureStateChanged:UIGestureRecognizerStateBegan isFinshed:NO trans:trans];
+        }
+    }
+    else if (gesture.state == UIGestureRecognizerStateChanged) {
+        
+        [self setTransform:CGAffineTransformScale(CGAffineTransformIdentity, 1-trans, 1-trans)];
+        self.center = CGPointMake(size.width/2 + translation.x,  size.height/2 + translation.y);
+        if (self.panDelegate && [self.panDelegate respondsToSelector:@selector(onPanGestureStateChanged:isFinshed:trans:)]) {
+            [self.panDelegate onPanGestureStateChanged:UIGestureRecognizerStateChanged isFinshed:NO trans:trans];
+        }
+    }
+    else if (gesture.state == UIGestureRecognizerStateEnded) {
+        if (trans > _trigger) {
+            if (self.panDelegate && [self.panDelegate respondsToSelector:@selector(onPanGestureStateChanged:isFinshed:trans:)]) {
+                [self.panDelegate onPanGestureStateChanged:UIGestureRecognizerStateEnded isFinshed:YES trans:trans];
+            }
+            return;
+        }
+        [UIView animateWithDuration:0.2 animations:^{
+            [self setTransform:CGAffineTransformIdentity];
+            self.center = CGPointMake(size.width/2 ,  size.height/2 );
+            if (self.panDelegate && [self.panDelegate respondsToSelector:@selector(onPanGestureStateChanged:isFinshed:trans:)]) {
+                [self.panDelegate onPanGestureStateChanged:UIGestureRecognizerStateEnded isFinshed:NO trans:trans];
+            }
+            [self.scrollView.pageControl setHidden:NO];
+        }];
+    }
+    
+}
 
 
 @end
