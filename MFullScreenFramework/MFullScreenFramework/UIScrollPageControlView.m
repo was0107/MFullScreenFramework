@@ -276,11 +276,6 @@ static char UIViewReuseIdentifier;
     [self.reuseDictioary removeAllObjects];
     
     [self setTransform:CGAffineTransformIdentity];
-    self.center = CGPointMake(_screenBounds.size.width/2 ,  _screenBounds.size.height/2 );
-    
-    [self setTransform:CGAffineTransformIdentity];
-    CGRect _screenBounds = [[UIScreen mainScreen]  bounds];
-    self.center = CGPointMake(_screenBounds.size.width/2 ,  _screenBounds.size.height/2 );
     [self.scrollView.pageControl setHidden:NO];
     
     _totalCount = [self.delegate numberOfView:self];

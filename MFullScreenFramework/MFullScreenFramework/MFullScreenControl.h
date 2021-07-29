@@ -12,6 +12,7 @@
 @interface MFullScreenControl : NSObject<UIScrollPagePanGestureDelegate>
 
 @property (nonatomic, strong) UIScrollPageControlView       *screenPageView;    //滚动视图
+@property (nonatomic, copy) void (^onPanFinshed)(UIView *view);   //单击的回调处理
 @property (nonatomic, assign) BOOL                           isAppear;          //记录当前状态
 
 /**

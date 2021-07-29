@@ -181,7 +181,11 @@
     }
     else if (state == UIGestureRecognizerStateEnded) {
         if (flag) {
-            [self disAppearOnView:self.screenPageView.currentView];
+            if (self.onPanFinshed) {
+                self.onPanFinshed(self.screenPageView.currentView);
+            } else {
+                [self disAppearOnView:self.screenPageView.currentView];
+            }
             return;
         }
         self.backgroundView.backgroundColor = [UIColor colorWithWhite:0 alpha:1];

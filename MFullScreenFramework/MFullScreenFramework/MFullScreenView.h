@@ -13,7 +13,7 @@
 @property (nonatomic, strong) UIScrollView  *scrollView;    //容器
 @property (nonatomic, strong) UIImageView   *imageView;     //执行动画的图片视图
 @property (nonatomic, assign, setter=enableDoubleTap:) BOOL isDoubleTapEnabled; //是否允许双击放大
-@property (nonatomic, strong) void (^singleTapBlock)(UITapGestureRecognizer *recognizer);   //单击的回调处理
+@property (nonatomic, copy) void (^singleTapBlock)(UITapGestureRecognizer *recognizer);   //单击的回调处理
 
 /**
  *  重新加载数据
